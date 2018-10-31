@@ -106,32 +106,46 @@ var levelState = {
       MoveSpeed = enemy.walkSpeed;
       this.PlayerMove();
     }*/
-    goAngle = game.physics.arcade.angleBetween(player, enemy);
-    goAngle = (goAngle * (180/Math.PI)) - 180;
-    enemy.angle = goAngle;
-    for(var i = 0; i < enemy.burst; i++){
-      Rifle.fire();
-        //if(i >= enemy.burst)
-        //i = 0
-    }
+    enemy.forEach(function(baddie){
+      goAngle = game.physics.arcade.angleBetween(player, baddie);
+      goAngle = (goAngle * (180/Math.PI)) - 180;
+      baddie.angle = goAngle;
+      //for(var i = 0; i < enemy.burst; i++){
+        Rifle.fireFrom.x = baddie.x;
+        Rifle.fireFrom.y = baddie.y;
+        Rifle.fire();
+          //if(i >= enemy.burst)
+            //i = 0
+        //  }
+    }, this);
+
 
   },
 
   generateEnemy: function(){
     //Setting up the Enemies
-    for(var i = 0; i < 3; i++){
-      enemy = game.add.sprite(this.game.world.randomX, this.game.world.randomY, 'Baddie')
-      game.physics.arcade.enable(enemy);
-      enemy.anchor.setTo(0.5, 0.5)
-      enemy.walkSpeed = 200
-      enemy.burst = 5
+    enemy = game.add.group();
+    baddie = enemy.create(this.game.world.randomX, this.game.world.randomY, 'Baddie')
+    enemy.add(baddie);
+    gun = game.add.group();
 
-      Rifle = this.add.weapon(100, 'bullet');
-  	  Rifle.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
-  	  Rifle.bulletAngleVariance = 20;
-  	  Rifle.bulletSpeed = 400;
-  	  Rifle.trackSprite(enemy, 16, 16, true);
+    for(var i = 0; i < 2; i++){
+
+      baddie = enemy.create(this.game.world.randomX, this.game.world.randomY, 'Baddie')
+
+      game.physics.arcade.enable(baddie);
+      baddie.anchor.setTo(0.5, 0.5);
+      enemy.walkSpeed = 200;
+      enemy.burst = 5;
+
+      //gun.add(Rifle);
     }
+    Rifle = game.add.weapon(100, 'bullet');
+    Rifle.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+    Rifle.bulletAngleVariance = 10;
+    Rifle.bulletSpeed = 400;
+    Rifle.trackSprite(baddie, 0, 0, true);
+
   },
 
   Hit: function(attack, target){
